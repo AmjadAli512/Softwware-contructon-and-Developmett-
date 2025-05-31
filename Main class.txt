@@ -1,0 +1,25 @@
+package scd_assig_2nd;
+
+import java.util.Scanner;
+
+public class MainClass {
+    public static void main(String[] args) {
+        AttendanceSystem system = new AttendanceSystem();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== Smart Attendance System ===");
+
+        System.out.print("Enter User ID: ");
+        String userId = scanner.nextLine();
+
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine();
+
+        // Attempt login and mark attendance
+        if (system.login(userId, password)) {
+            system.markAttendance(userId);
+        }
+
+        scanner.close();
+    }
+}

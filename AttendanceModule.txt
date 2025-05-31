@@ -1,0 +1,140 @@
+package assig_2nd_scd;
+import java.time.LocalTime;
+import java.util.HashMap;
+
+// Represents a generic system user
+class User {
+    protected String userId;
+    protected String password;
+
+    public User(String userId, String password) {
+        this.userId = userId;
+        this.password = password;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public boolean authenticate(String inputPassword) {
+        return this.password.equals(inputPassword);
+    }
+}
+
+// Represents a student user
+class Student extends User {
+    private boolean isEnrolled;
+
+    public Student(String userId, String password, boolean isEnrolled) {
+        super(userId, password);
+        this.isEnrolled = isEnrolled;
+    }
+
+    public boolean isEnrolled() {
+        return isEnrolled;
+    }
+}
+
+// Represents a scheduled class session
+class ClassSchedule {
+    private String courseName;
+    private String classroom;
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    public ClassSchedule(String courseName, String classroom, LocalTime startTime, LocalTime endTime) {
+        this.courseName = courseName;
+        this.classroom = classroom;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public boolean isClassOngoing() {
+        LocalTime now = LocalTime.now();
+        return now.isAfter(startTime) && now.isBefore(endTime);
+    }
+
+    public String getClassroom() {
+        return classroom;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public String getScheduleMessage() {
+        return "Class: " + courseName + "\nRoom: " + classroom + "\nTime: " + startTime + " - " + endTime;
+    }
+}
+
+// Handles login, attendance, and notifications
+class AttendanceSystem {
+    private HashMap<String, Student> studentDB = new HashMap<>();
+    protected HashMap<String, ClassSchedule> scheduleDB = new HashMap<>();
+
+
+    public AttendanceSystem() {
+        // Register student
+        studentDB.put("NUML-S23-34990", new Student("NUML-S23-34990", "SP-23-712", true));
+
+        // Register class schedule
+        scheduleDB.put("NUML-S23-34990", new ClassSchedule(
+            "Software Construction & Development",
+            "Room SE-LAB2",
+            LocalTime.of(14, 30),
+            LocalTime.of(19, 10)
+        ));
+    }
+
+    public boolean login(String userId, String password) {
+        Student student = studentDB.get(userId);
+        if (student != null && student.authenticate(password)) {
+            System.out.println("Login successful!");
+            notifySchedule(userId);  // Notify about class info
+            return true;
+        } else {
+            System.out.println("Invalid credentials.");
+            return false;
+        }
+    }
+
+    public boolean markAttendance(String userId) {
+        Student student = studentDB.get(userId);
+        ClassSchedule schedule = scheduleDB.get(userId);
+
+        if (student == null || !student.isEnrolled()) {
+            System.out.println("Attendance failed: not enrolled or invalid student.");
+            return false;
+        }
+
+        if (schedule == null) {
+            System.out.println("No class schedule found for this student.");
+            return false;
+        }
+
+        if (schedule.isClassOngoing()) {
+            System.out.println("Attendance marked for student: " + userId);
+            notifyFaculty(userId);
+            return true;
+        } else {
+            System.out.println("Attendance failed: class is not ongoing.");
+            return false;
+        }
+    }
+
+    private void notifyFaculty(String studentId) {
+        ClassSchedule schedule = scheduleDB.get(studentId);
+        if (schedule != null) {
+            System.out.println("Faculty notified: " + studentId + " attended " + schedule.getCourseName() +
+                " in " + schedule.getClassroom());
+        }
+    }
+
+    private void notifySchedule(String studentId) {
+        ClassSchedule schedule = scheduleDB.get(studentId);
+        if (schedule != null) {
+            System.out.println("Class Notification to Student:");
+            System.out.println(schedule.getScheduleMessage());
+        }
+    }
+}

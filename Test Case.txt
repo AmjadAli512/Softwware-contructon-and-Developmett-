@@ -1,0 +1,52 @@
+package assig_2nd_scd;
+
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import assig_2nd_scd.AttendanceModule;
+
+public class AttendanceModuleTest {
+
+    private AttendanceModule attendanceModule;
+
+    @Before
+    public void setUp() {
+        attendanceModule = new AttendanceModule();
+    }
+
+    @Test
+    public void testLoginWithCorrectCredentials() {
+        boolean result = attendanceModule.login("NUML-S23-34990", "SP-23-712");
+        assertTrue("Login should succeed with correct credentials", result);
+    }
+
+    @Test
+    public void testLoginWithWrongPassword() {
+        boolean result = attendanceModule.login("NUML-S23-34990", "wrong-pass");
+        assertFalse("Login should fail with incorrect password", result);
+    }
+
+    @Test
+    public void testLoginWithInvalidUserId() {
+        boolean result = attendanceModule.login("invalid-user", "any");
+        assertFalse("Login should fail with invalid userId", result);
+    }
+
+    @Test
+    public void testMarkAttendanceDuringClass() {
+        
+        boolean result = attendanceModule.markAttendance("NUML-S23-34990");
+        assertTrue("Attendance should be marked if class is ongoing", result);
+    }
+
+    @Test
+    public void testMarkAttendanceForInvalidStudent() {
+        boolean result = attendanceModule.markAttendance("invalid-user");
+        assertFalse("Attendance should fail for invalid student", result);
+    }
+}
+
+
+
+
+
